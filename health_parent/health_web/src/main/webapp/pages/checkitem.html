@@ -229,15 +229,19 @@
         //钩子函数，VUE对象初始化完成后自动执行
         created() {
             // 发送请求
-            axios.get("/checkItem/findAll.do").then(res => {
-                console.log("初始化页面:" + JSON.stringify(res));
-                if (res.data.flag) {
-                    // 绑定分页数据
-                    this.dataList = res.data.data
-                } else {
-                    this.$message(res.data.message);
-                }
-            })
+            //axios.get("/checkItem/findAll.do").then(res => {
+            //    if (res.data.flag) {
+            //
+            //
+            //        // 绑定分页数据
+            //        this.dataList = res.data.data
+            //    } else {
+            //        this.$message(res.data.message);
+            //    }
+            //})
+
+            // 分页查询
+            this.findPage();
         },
         methods: {
             //编辑
@@ -245,30 +249,40 @@
             },
             //添加
             handleAdd() {
+                //校验表单输入项是否合法
                 this.$refs['dataAddForm'].validate((valid) => {
                     if (valid) {
-                        // 校验通过 2个参数，提交json对象，属于提交请求体，后台用@RequestBody post,put
-                        //@RequestParam ?name=xxx
-                        //@PathVariable /checkitem/1
-                        //@RequestHeader header key=value
-                        //@RequestCookie cookie key=value
-                        axios.post('/checkitem/add.do?', this.formData).then(res => {
-                            this.$message({
-                                message: res.data.message,
-                                type: res.data.flag ? "success" : "error"
-                            });
+                        //表单数据校验通过，发送ajax请求将表单数据提交到后台
+                        axios.post("/checkItem/add.do", this.formData).then((res) => {
+                            //隐藏新增窗口
+                            this.dialogFormVisible = false;
+                            //判断后台返回的flag值，true表示添加操作成功，false为添加操作失败
                             if (res.data.flag) {
-                                // 成功则要关闭窗口
-                                this.dialogFormVisible = false;
-                                // 刷新列表
-                                this.findPage();
+                                this.$message({
+                                    message: res.data.message,
+                                    type: 'success'
+                                });
+                            } else {
+                                this.$message.error(res.data.message);
                             }
                         })
+                    } else {
+                        this.$message.error("表单数据校验失败");
+                        return false;
                     }
                 });
             },
             //分页查询
             findPage() {
+                axios.post("/checkItem/findPage.do",this.pagination).then(res => {
+                    if (res.data.flag){
+                        // 绑定分页数据
+                        this.pagination.total = res.data.data.total;
+                        this.dataList = res.data.data.rows;
+                    } else {
+                        this.$message.error(res.data.message)
+                    }
+                })
             },
             // 重置表单
             resetForm() {
@@ -286,6 +300,11 @@
             },
             //切换页码
             handleCurrentChange(currentPage) {
+                //currentPage 为修改后的页面
+                // 设置分页查询时使用的页码
+                this.pagination.currentPage = currentPage;
+                // 分页查询
+                this.findPage();
             },
             // 删除
             handleDelete(row) {

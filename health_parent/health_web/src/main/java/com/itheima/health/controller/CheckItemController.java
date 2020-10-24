@@ -2,12 +2,12 @@ package com.itheima.health.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.itheima.health.constant.MessageConstant;
+import com.itheima.health.entity.PageResult;
+import com.itheima.health.entity.QueryPageBean;
 import com.itheima.health.entity.Result;
 import com.itheima.health.pojo.CheckItem;
 import com.itheima.health.service.CheckItemService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,5 +27,23 @@ public class CheckItemController {
     public Result findAll() {
         List<CheckItem> checkItems = checkItemService.findAll();
         return new Result(true, MessageConstant.QUERY_CHECKITEM_SUCCESS, checkItems);
+    }
+
+    /**
+     * 新增检查项
+     *
+     * @param checkItems
+     * @return
+     */
+    @PostMapping("/add")
+    public Result add(@RequestBody CheckItem checkItems) {
+        checkItemService.add(checkItems);
+        return new Result(true, MessageConstant.ADD_CHECKITEM_SUCCESS);
+    }
+
+    @PostMapping("/findPage")
+    public Result findPage(@RequestBody QueryPageBean queryPageBean) {
+        PageResult<CheckItem> pageResult = checkItemService.findPage(queryPageBean);
+        return new Result(true, MessageConstant.QUERY_CHECKITEM_SUCCESS, pageResult);
     }
 }

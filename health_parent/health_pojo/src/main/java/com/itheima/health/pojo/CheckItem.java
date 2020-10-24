@@ -89,3 +89,4 @@ public class CheckItem implements Serializable {
         this.type = type;
     }
 }
+
