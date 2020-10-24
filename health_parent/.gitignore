@@ -6,5 +6,6 @@
 **/*.iml
 # 所有子文件夹下的target
 **/target
-# 所有子文件下的日志
-**/mylog
+# 日志
+mylog.txt
+
