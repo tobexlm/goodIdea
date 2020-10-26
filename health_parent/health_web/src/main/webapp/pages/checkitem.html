@@ -246,6 +246,30 @@
         methods: {
             //编辑
             handleEdit() {
+                //校验表单输入项是否合法
+                this.$refs['dataEditForm'].validate((valid) => {
+                    if (valid) {
+                        //表单数据校验通过，发送ajax请求将表单数据提交到后台
+                        axios.post("/checkItem/update.do", this.formData).then((res) => {
+                            //隐藏编辑窗口
+                            this.dialogFormVisible4Edit = false;
+                            //判断后台返回的flag值，true表示添加操作成功，false为添加操作失败
+                            if (res.data.flag) {
+                                this.$message({
+                                    message: res.data.message,
+                                    type: 'success'
+                                });
+                                // 刷新页面
+                                this.findPage();
+                            } else {
+                                this.$message.error(res.data.message);
+                            }
+                        })
+                    } else {
+                        this.$message.error("表单数据校验失败");
+                        return false;
+                    }
+                });
             },
             //添加
             handleAdd() {
@@ -262,6 +286,8 @@
                                     message: res.data.message,
                                     type: 'success'
                                 });
+                                // 刷新页面
+                                this.findPage();
                             } else {
                                 this.$message.error(res.data.message);
                             }
@@ -272,10 +298,10 @@
                     }
                 });
             },
-            //分页查询
+            //检查项分页查询
             findPage() {
-                axios.post("/checkItem/findPage.do",this.pagination).then(res => {
-                    if (res.data.flag){
+                axios.post("/checkItem/findPage.do", this.pagination).then(res => {
+                    if (res.data.flag) {
                         // 绑定分页数据
                         this.pagination.total = res.data.data.total;
                         this.dataList = res.data.data.rows;
@@ -290,13 +316,37 @@
             },
             // 弹出添加窗口
             handleCreate() {
-                //弹出添加窗口
-                this.dialogFormVisible = true;
                 //重置表单
                 this.resetForm();
+                //弹出添加窗口
+                this.dialogFormVisible = true;
             },
             // 弹出编辑窗口
             handleUpdate(row) {
+                // 重置表单
+                this.resetForm();
+                // 弹出添加窗口
+                this.dialogFormVisible4Edit = true;
+                // 检查项id
+                let id = row.id;
+                // 发送请求,通过id查询到回显数据并绑定表单数据this.formData
+                axios.get("/checkItem/findById.do?id=" + id).then(res => {
+                    /*
+                        res:[
+                            flag:
+                            message:
+                            data:{
+                                CheckItem:
+                            }
+                        ]
+                    */
+                    if (res.data.flag) {
+                        // 绑定表单数据
+                        this.formData = res.data.data
+                    } else {
+                        this.$message.error(res.data.message)
+                    }
+                })
             },
             //切换页码
             handleCurrentChange(currentPage) {
@@ -308,6 +358,35 @@
             },
             // 删除
             handleDelete(row) {
+                // 检查项id
+                let id = row.id;
+                // 删除确认提示框
+                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    // 发送删除请求,参数:检查项id,删除后刷新页面this.findPage()
+                    axios.post("/checkItem/deleteById.do?id=" + id).then(res => {
+                        /**
+                         * 响应:
+                         *      res:{
+                         *          flag:true
+                         *          message:"删除检查项成功"
+                         *      }
+                         */
+                        this.$message({
+                            message: res.data.message,
+                            type: res.data.flag ? "success" : "error"
+                        });
+                        if (res.data.flag) {
+                            // 刷新页面
+                            this.findPage();
+                        }
+                    })
+                }).catch(() => {
+                    // 用户取消删除
+                });
             }
         }
     })
