@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace属性：名称空间， 写接口的全限定名-->
+<mapper namespace="com.itheima.health.dao.CheckGroupDao">
+    <!--新增检查组-->
+    <insert id="add">
+        insert into t_checkgroup (code, name, helpCode, sex, remark, attention)
+        values (#{code}, #{name}, #{helpCode}, #{sex}, #{remark}, #{attention})
+    </insert>
+
+    <!--按条件分页查询-->
+    <select id="findPage" resultType="com.itheima.health.pojo.CheckGroup">
+        select *
+        from t_checkgroup
+        <where>
+            <if test="queryString != null and queryString != ''">
+                code like #{queryString}
+                or name like #{queryString}
+                or helpCode like #{queryString}
+            </if>
+        </where>
+    </select>
+
+    <!--根据id查询检查组信息-->
+    <select id="findById" resultType="com.itheima.health.pojo.CheckGroup">
+        select *
+        from t_checkgroup
+        where id = #{id}
+    </select>
+
+    <!--通过id获取检查项复选框勾选-->
+    <select id="findCheckgroupIdsBySetmealId" resultType="java.lang.Integer">
+        SELECT checkitem_id
+        FROM t_checkgroup_checkitem
+        WHERE checkgroup_id = #{id}
+    </select>
+
+    <!--更新套餐信息-->
+    <update id="update">
+        update t_checkgroup
+        set code=#{code},
+            name=#{name},
+            helpCode=#{helpCode},
+            sex=#{sex},
+            remark=#{remark},
+            attention=#{attention}
+        where id = #{id}
+    </update>
+
+    <!--删除旧关系-->
+    <delete id="deleteCheckGroupAndCheckItem">
+        delete
+        from t_checkgroup_checkitem
+        where checkgroup_id = #{id}
+    </delete>
+
+    <!--添加新关系-->
+    <insert id="addSetmealCheckGroup">
+        insert into t_checkgroup_checkitem (checkgroup_id, checkitem_id)
+        values (#{checkgroupId}, #{checkitemId})
+    </insert>
+
+    <!--查询检查组-->
+    <select id="findAll" resultType="com.itheima.health.pojo.CheckGroup">
+        select *
+        from t_checkgroup
+    </select>
+
+    <!--是否被套餐所使用-->
+    <select id="QueryCheckgroupRelatedSetmeal" resultType="java.lang.Integer">
+        SELECT count(0)
+        FROM t_setmeal_checkgroup
+        WHERE checkgroup_id = #{id}
+    </select>
+
+    <!--删除检查组-->
+    <delete id="deleteCheckgroup">
+        delete
+        from t_checkgroup
+        where id = #{id}
+    </delete>
+
+</mapper>
