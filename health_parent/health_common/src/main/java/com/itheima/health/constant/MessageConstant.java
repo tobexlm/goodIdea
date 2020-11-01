@@ -4,6 +4,7 @@ package com.itheima.health.constant;
  * 消息常量
  */
 public interface MessageConstant {
+    static final String REACQUIREL_CODE = "请重新获取验证码";
     static final String DELETE_CHECKITEM_FAIL = "删除检查项失败";
     static final String DELETE_CHECKITEM_SUCCESS = "删除检查项成功";
     static final String ADD_CHECKITEM_SUCCESS = "新增检查项成功";
@@ -41,6 +42,7 @@ public interface MessageConstant {
     static final String EDIT_MEMBER_SUCCESS = "编辑会员成功";
     static final String TELEPHONE_VALIDATECODE_NOTNULL = "手机号和验证码都不能为空";
     static final String LOGIN_SUCCESS = "登录成功";
+    static final String LOGIN_ERROR = "登录失败";
     static final String VALIDATECODE_ERROR = "验证码输入错误";
     static final String QUERY_ORDER_SUCCESS = "查询预约信息成功";
     static final String QUERY_ORDER_FAIL = "查询预约信息失败";
@@ -50,6 +52,7 @@ public interface MessageConstant {
     static final String QUERY_SETMEAL_FAIL = "查询套餐数据失败";
     static final String SEND_VALIDATECODE_FAIL = "验证码发送失败";
     static final String SEND_VALIDATECODE_SUCCESS = "验证码发送成功";
+    static final String SENT_VALIDATECODE = "验证码已经发送过了,请注意查收";
     static final String SELECTED_DATE_CANNOT_ORDER = "所选日期不能进行体检预约";
     static final String ORDER_FULL = "预约已满";
     static final String HAS_ORDERED = "已经完成预约，不能重复预约";

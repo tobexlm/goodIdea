@@ -13,9 +13,12 @@ import com.itheima.health.util.QiNiuUtils;
 import org.apache.zookeeper.data.Id;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 import java.io.IOException;
 import java.util.*;
@@ -30,6 +33,8 @@ public class SetmealController {
     @Reference
     private SetmealService setmealService;
 
+    @Autowired
+    private JedisPool jedisPool;
     /**
      * 图片上传
      *
@@ -72,7 +77,11 @@ public class SetmealController {
     @PostMapping("/add")
     public Result add(@RequestBody Setmeal setmeal, Integer[] checkgroupIds) {
         // 调用service
-        setmealService.add(setmeal, checkgroupIds);
+        Integer setmealId = setmealService.add(setmeal, checkgroupIds);
+        Jedis jedis = jedisPool.getResource();
+        String key = "setmeal:static:html";
+        jedis.sadd(key,setmealId+"|1|" + System.currentTimeMillis());
+        jedis.close();
         // 响应
         return new Result(true, MessageConstant.ADD_SETMEAL_SUCCESS);
     }
@@ -129,6 +138,10 @@ public class SetmealController {
     @PostMapping("/update")
     public Result update(Integer[] checkgroupIds, @RequestBody Setmeal setmeal) {
         setmealService.update(checkgroupIds, setmeal);
+        Jedis jedis = jedisPool.getResource();
+        String key = "setmeal:static:html";
+        jedis.sadd(key,setmeal.getId()+"|1|" + System.currentTimeMillis());
+        jedis.close();
         return new Result(true, MessageConstant.EDIT_SETMEAL_SUCCESS);
     }
 
@@ -141,6 +154,10 @@ public class SetmealController {
     @PostMapping("/deleteById")
     public Result deleteById(int id) {
         setmealService.deleteById(id);
+        Jedis jedis = jedisPool.getResource();
+        String key = "setmeal:static:html";
+        jedis.sadd(key,id+"|0|" + System.currentTimeMillis());
+        jedis.close();
         return new Result(true, MessageConstant.DELETE_SETMEAL_SUCCESS);
     }
 }

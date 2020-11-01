@@ -33,7 +33,7 @@ public class SetmealServiceImpl implements SetmealService {
      */
     @Override
     @Transactional
-    public void add(Setmeal setmeal, Integer[] checkgroupIds) {
+    public Integer add(Setmeal setmeal, Integer[] checkgroupIds) {
         // 添加套餐信息
         setmealDao.add(setmeal);
 
@@ -46,6 +46,7 @@ public class SetmealServiceImpl implements SetmealService {
                 setmealDao.addSetmealCheckGroup(setmealId, checkgroupId);
             }
         }
+        return setmealId;
     }
 
     /**
@@ -123,7 +124,7 @@ public class SetmealServiceImpl implements SetmealService {
      */
     @Override
     @Transactional
-    public void deleteById(int id){
+    public void deleteById(int id) {
         // 先判断是否存在订单,存在则不能删除
         int cnt = setmealDao.findOrderCountBySetmealId(id);
         if (cnt > 0) {
@@ -135,4 +136,37 @@ public class SetmealServiceImpl implements SetmealService {
         setmealDao.deleteSetmealAndCheckgroup(id);
         setmealDao.deleteById(id);
     }
+
+    /**
+     * 查询所有套餐信息
+     *
+     * @return
+     */
+    @Override
+    public List<Setmeal> findAll() {
+        return setmealDao.findAll();
+    }
+
+    /**
+     * 查询套餐详情
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public Setmeal findDetailById(int id) {
+        // 查询套餐信息
+        return setmealDao.findDetailById(id);
+    }
+
+    /**
+     * 获取数据库套餐的图片
+     *
+     * @return
+     */
+    @Override
+    public List<String> findImgs() {
+        return setmealDao.findImgs();
+    }
+
 }

@@ -75,7 +75,62 @@
 
     <!--查询套餐下是否有进行的订单-->
     <select id="findOrderCountBySetmealId" resultType="java.lang.Integer">
-        SELECT count(1) FROM t_order WHERE setmeal_id=#{id}
+        SELECT count(1)
+        FROM t_order
+        WHERE setmeal_id = #{id}
     </select>
+
+    <!--查询所有套餐信息-->
+    <select id="findAll" resultType="com.itheima.health.pojo.Setmeal">
+        select *
+        from t_setmeal
+    </select>
+
+    <!--查询套餐详情-->
+    <select id="findDetailById" resultMap="setmealResultMap">
+        SELECT s.id,
+               s.name,
+               s.sex,
+               s.age,
+               s.remark,
+               s.img,
+               sc.checkgroup_id,
+               g.NAME   AS checkgroup_name,
+               g.remark AS checkgroup_remark,
+               cc.checkitem_id,
+               c.NAME   AS checkitem_name
+        FROM t_setmeal AS s
+                 LEFT JOIN t_setmeal_checkgroup AS sc ON s.id = sc.setmeal_id
+                 LEFT JOIN t_checkgroup AS g ON sc.checkgroup_id = g.id
+                 LEFT JOIN t_checkgroup_checkitem AS cc ON g.id = cc.checkgroup_id
+                 LEFT JOIN t_checkitem AS c ON cc.checkitem_id = c.id
+        WHERE s.id = #{id}
+    </select>
+    <!--套餐-->
+    <resultMap id="setmealResultMap" type="Setmeal">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="sex" column="sex"/>
+        <result property="age" column="age"/>
+        <result property="remark" column="remark"/>
+        <result property="img" column="img"/>
+        <!--检查组-->
+        <collection property="checkGroups" ofType="CheckGroup">
+            <id property="id" column="checkgroup_id"/>
+            <result property="name" column="checkgroup_name"/>
+            <result property="remark" column="checkgroup_remark"/>
+            <!--检查项-->
+            <collection property="checkItems" ofType="checkItem">
+                <id property="id" column="checkitem_id"/>
+                <result property="name" column="checkitem_name"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <!--查询数据库中的图片-->
+    <select id="findImgs" resultType="java.lang.String">
+        SELECT img FROM t_setmeal
+    </select>
+
 
 </mapper>

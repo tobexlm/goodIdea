@@ -15,7 +15,7 @@ public interface SetmealService {
      * @param setmeal
      * @param checkgroupIds
      */
-    void add(Setmeal setmeal, Integer[] checkgroupIds);
+    Integer add(Setmeal setmeal, Integer[] checkgroupIds);
 
     /**
      * 分页查询套餐列表
@@ -55,4 +55,25 @@ public interface SetmealService {
      * @param id
      */
     void deleteById(int id) throws MyException;
+
+    /**
+     * 查询所有套餐信息
+     * @return
+     */
+    List<Setmeal> findAll();
+
+    /**
+     * 查询套餐详情
+     *
+     * @param id
+     * @return
+     */
+    Setmeal findDetailById(int id);
+
+    /**
+     * 获取数据库套餐的图片
+     *
+     * @return
+     */
+    List<String> findImgs();
 }

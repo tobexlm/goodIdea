@@ -135,11 +135,66 @@
                 leftobj: []//用于装载页面显示的月份已经进行预约设置的数据
             },
             created: function () {//在vue初始化时调用
+
+                // 画日历
                 this.initData(null);
+
+                this.getDataByMonth();
             },
             methods: {
+                getDataByMonth(){
+                    // 必须在initData方法后获取
+                    //his.currentYear + this.currentMonth
+                    // 2020-09 2020-11
+                    var month = this.currentMonth;
+                    if(this.currentMonth <= 9){
+                        month = "0" + month
+                    };
+                    month = this.currentYear + "-" + month;
+
+                    axios.get('/ordersetting/getOrderSettingByMonth.do?month=' + month).then(res => {
+                        if(res.data.flag){
+                            this.leftobj = res.data.data;
+                        }else{
+                            this.$message.error(res.data.message);
+                        }
+                    })
+                    /*this.leftobj = [
+                        { date: 6, number: 126, reservations: 1 },
+                        { date: 1, number: 121, reservations: 1 },
+                        { date: 3, number: 123, reservations: 1 },
+                        { date: 4, number: 124, reservations: 120 },
+                        { date: 8, number: 128, reservations: 1 }
+                    ];*/
+                },
 				//预约设置
                 handleOrderSet(day){
+                    this.$prompt('请输入数量', '预约设置', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        inputPattern: /^[1-9]\d*$/,
+                        inputErrorMessage: '请输入自然数'
+                    }).then(({ value }) => {
+                       //alert(value);
+                        var year = day.getFullYear();
+                        var month = day.getMonth() + 1;
+                        var date = day.getDate();
+                        var orderDate = this.formatDate(year,month,date);
+                        var number = value;
+                        var json = {orderDate, number}; // es6 对象的简化写法,变量名为key, 变量值为value
+                        // 提交设置
+                        axios.post('/ordersetting/editNumberByDate.do',json).then(res => {
+                            this.$message({
+                                message: res.data.message,
+                                type: res.data.flag?"success":"error"
+                            });
+                            if(res.data.flag){
+                                this.getDataByMonth();
+                            }
+                        })
+                    }).catch(() => {
+
+                    });
                 },
 				//上传之前进行文件格式校验
                 beforeUpload(file){
@@ -160,15 +215,10 @@
                 },
 				//上传成功提示
                 handleSuccess(response, file) {
-                    if(response.flag){
-                        this.$message({
-                            message: response.message,
-                            type: 'success'
-                        });
-                    }else{
-                        this.$message.error(response.message);
-                    }
-                    console.log(response, file, fileList);
+                    this.$message({
+                        message: response.message,
+                        type: response?"success":"error"
+                    })
                 },
                 //初始化当前页要展示的日期
 				initData: function (cur) {
@@ -228,19 +278,13 @@
                             dayobject.index = index++;
                         this.days.push(dayobject);
                     }
-                    
-                    /*this.leftobj = [
-                        { date: 1, number: 120, reservations: 1 },
-                        { date: 3, number: 120, reservations: 1 },
-                        { date: 4, number: 120, reservations: 120 },
-                        { date: 6, number: 120, reservations: 1 },
-                        { date: 8, number: 120, reservations: 1 }
-                    ];*/
+
                 },
 				//切换到当前月份
                 goCurrentMonth: function (year, month) {
                     var d = new Date();
                     this.initData(this.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
+                    this.getDataByMonth();
                 },
 				//向前一个月
                 pickPre: function (year, month) {
@@ -250,12 +294,15 @@
                     var d = new Date(this.formatDate(year, month, 1));
                     d.setDate(0);
                     this.initData(this.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
+                    // 月份发生变化了，重新加载数据
+                    this.getDataByMonth();
                 },
 				//向后一个月
                 pickNext: function (year, month) {
                     var d = new Date(this.formatDate(year, month, 1));
                     d.setDate(35);////获取指定天之后的日期
                     this.initData(this.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
+                    this.getDataByMonth();
                 },
                 // 返回 类似 2016-01-02 格式的字符串
                 formatDate: function (year, month, day) {
