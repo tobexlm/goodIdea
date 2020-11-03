@@ -9,6 +9,7 @@ import com.itheima.health.pojo.CheckItem;
 import com.itheima.health.service.CheckItemService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,6 +42,7 @@ public class CheckItemController {
      * @return
      */
     @PostMapping("/add")
+    @PreAuthorize("hasAuthority('CHECKITEM_ADD')")
     public Result add(@RequestBody CheckItem checkItems) {
         checkItemService.add(checkItems);
         return new Result(true, MessageConstant.ADD_CHECKITEM_SUCCESS);
@@ -53,6 +55,7 @@ public class CheckItemController {
      * @return
      */
     @PostMapping("/findPage")
+    @PreAuthorize("hasAuthority('CHECKITEM_QUERY')")
     public Result findPage(@RequestBody QueryPageBean queryPageBean) {
         PageResult<CheckItem> pageResult = checkItemService.findPage(queryPageBean);
         return new Result(true, MessageConstant.QUERY_CHECKITEM_SUCCESS, pageResult);
