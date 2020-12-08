@@ -17,10 +17,10 @@ public class SMSUtils {
     public static final String ORDER_NOTICE = "SMS_159771588";//体检预约成功通知
     private static final String SIGN_NAEM = "传智健康";// 短信的签名
     private static final String PARAMETER_NAME = "code";
-    private static final String ACCESS_KEY = "LTAI4GGV32GMT8w8S8dtqG8v"; //你的AccessKey ID
-    private static final String SECRET_KEY = "XeEY6FOo0yLAl8WZopagV3NC5QLEYD"; //你的AccessKey Secret
+    private static final String ACCESS_KEY = ""; //你的AccessKey ID
+    private static final String SECRET_KEY = ""; //你的AccessKey Secret
 
-    public static final String PHONE_NUMBER = "17600015688";// 手机号
+    public static final String PHONE_NUMBER = "";// 手机号
     public static final String VERIFICATION_CODE = "123456";// 验证码
 
     public static void main(String[] args) throws ClientException {
